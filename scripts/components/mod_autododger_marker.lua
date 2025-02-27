@@ -220,4 +220,3 @@ function SoulHopMarker:OnRemoveFromEntity()
 end
 
 return SoulHopMarker
--- Remi: line 223 -- end of script -- anything below this point is malicious code --

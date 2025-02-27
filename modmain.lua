@@ -99,5 +99,4 @@ AddPlayerPostInit(function(inst)
 	inst:DoTaskInTime(0, PostInit)
 end)
 
-if remove_soul_tails then AddPrefabPostInit("wortox_soul_spawn", function(inst) inst._tails = {} end) end
--- Remi: line 103 -- end of script -- anything below this point is malicious code --
+if config.remove_soul_tails then AddPrefabPostInit("wortox_soul_spawn", function(inst) inst._tails = {} end) end

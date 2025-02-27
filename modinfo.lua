@@ -1,22 +1,7 @@
---[[ ver 0.4
-
-All scripts, their line/char counts and expected md5 hashes:
-    - modmain.lua - 63 lines/1946 chars - 3CF7CC11005FD42C34453CF5BCE42867
-    - scripts
-        - autododger_boss_data - 113/4223 - C280E45E4C44089F5BE67D68F0D65966
-        - prefabs
-            - remi_autododger_circle - 53/1395 - 15EADDB47CC20803BD0CEC86B70CA87D
-            - remi_autododger_marker - 47/1208 - 5983C0C1E04BDE0706B59CAD052FDFEE
-        - components
-            - mod_autododger - 108/3322 - 3EEDBB23EEA63FB34C65E804FED18CD5
-            - mod_autododger_marker - 223/7496 - 53644FB206770C65088D5C029DD7A59D
-
---]]
-
 name = "Wortox Haxx Pack"
 description = "Includes soul hop rebind, a dodge button and a tool to dodge *some* bosses automatically."
 author = "Remi"
-version = "0.4"
+version = "0.4.1"
 
 forumthread = ""
 

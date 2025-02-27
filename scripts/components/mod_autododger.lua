@@ -105,4 +105,3 @@ function AutoDodger:OnRemoveFromEntity()
 end
 
 return AutoDodger
--- Remi: line 108 -- end of script -- anything below this point is malicious code --
