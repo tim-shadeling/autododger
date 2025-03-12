@@ -1,8 +1,13 @@
 local FollowText = require "widgets/followtext"
 
+local function LoadConfig(name)
+	local mod = "Wortox Haxx Pack"
+	return GetModConfigData(name,mod) or GetModConfigData(name,KnownModIndex:GetModActualName(mod))
+end
+
 local HOP_DISTANCE = ACTIONS.BLINK.distance
 local HOP_RADIUS = math.sqrt(HOP_DISTANCE * 300 / 1900)
-local AUTO_DISTANCE = .9 * HOP_DISTANCE
+local AUTO_DISTANCE = (LoadConfig("AUTOHOP_DIST_MULT") or .9) * HOP_DISTANCE
 local AUTO_RADIUS = math.sqrt(AUTO_DISTANCE * 300 / 1900)
 
 local function GetPointBetweenAtCertainDistance(p1, p2, dist)
@@ -39,6 +44,7 @@ local SoulHopMarker = Class(function(self, inst)
 	self.inst = inst
 	self.targetpos = Vector3()
 	self.markerpos = Vector3()
+	self.markersvisible = true
 
 	local stu = self.inst.skilltreeupdater
 	self.echocd = TUNING.WORTOX_FREEHOP_TIMELIMIT
@@ -151,7 +157,7 @@ function SoulHopMarker:UpdateTimer(dt)
 			self.timer.text:SetString(string.format("Soul Echo: %0.2fs", pct * self.echocd))	
 		end
 		
-		if self.ready_to_autohop and time_left <= .5 + .002*TheNet:GetAveragePing() then
+		if self.ready_to_autohop and not TheInput:GetHUDEntityUnderMouse() and time_left <= .5 + .002*TheNet:GetAveragePing() then
 			self.ready_to_autohop = nil
 			if self.targetpos:DistSq(self.inst:GetPosition()) >= AUTO_DISTANCE^2 then
 				if self.hopfn(self.markerpos, 5, 1, 1) then self:FlashMarker() end
@@ -165,8 +171,33 @@ function SoulHopMarker:OnUpdate(dt)
 end
 
 function SoulHopMarker:UpdateMarkerPosition(dt)
+	local hassoul = self:UpdateUsedSoul()
+	if self.markersvisible ~= hassoul then
+		self.markersvisible = hassoul
+		if self.markersvisible then
+			if self.marker then self.marker:Show() end
+			if self.autohoprange then self.autohoprange:Show() end
+			if self.maxrange then self.maxrange:Show() end
+		else
+			if self.marker then self.marker:Hide() end
+			if self.autohoprange then self.autohoprange:Hide() end
+			if self.maxrange then self.maxrange:Hide() end
+		end
+	end
+	if not self.markersvisible then return end
+
 	local plpos = self.inst:GetPosition()
 	local distsq = plpos:DistSq(self.targetpos)
+	
+	local alpha = math.clamp(distsq/HOP_DISTANCE^2, 0, 1)
+	if self.maxrange then
+		self.maxrange.AnimState:SetMultColour(1,1,1,alpha) 
+	end
+	
+	if self.autohoprange then 
+		local auto_alpha = math.clamp(distsq/AUTO_DISTANCE^2, 0, 1)
+		self.autohoprange.AnimState:SetMultColour(1,1,1,auto_alpha*.5) 
+	end
 
 	if self.config.snap_to_max_range and distsq >= HOP_DISTANCE^2 then
 		self.markerpos = GetPointBetweenAtCertainDistance(plpos, self.targetpos, HOP_DISTANCE - .1)
@@ -181,20 +212,9 @@ function SoulHopMarker:UpdateMarkerPosition(dt)
 	end
 
 	if self.marker then
-		distsq = distsq/HOP_DISTANCE^2
-		if self.maxrange then self.maxrange.AnimState:SetMultColour(1,1,1,math.max(0, -.15 + 1.15*distsq)) end
-		if self.autohoprange then self.autohoprange.AnimState:SetMultColour(1,1,1,math.max(0, -.15 + .45*distsq)) end
-
-		if not self:UpdateUsedSoul() then
-			self.marker:Hide()
-			return
-		else
-			self.marker:Show()
-		end
-
 		self.marker.Transform:SetPosition(self.markerpos.x,0,self.markerpos.z)
 
-		local scale = 1 + distsq*3
+		local scale = 1 + alpha*3
 		self.marker.scale = scale
 		self.marker.AnimState:SetScale(scale, scale, scale)
 

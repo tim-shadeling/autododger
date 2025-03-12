@@ -1,6 +1,6 @@
 local _G = GLOBAL
 local TheNet, RPC, ACTIONS = _G.TheNet, _G.RPC, _G.ACTIONS
-local TheInput = _G.TheInput
+local TheInput, CONTROL_MOVE_RIGHT, CONTROL_MOVE_LEFT, CONTROL_MOVE_UP, CONTROL_MOVE_DOWN = _G.TheInput, _G.CONTROL_MOVE_RIGHT, _G.CONTROL_MOVE_LEFT, _G.CONTROL_MOVE_UP, _G.CONTROL_MOVE_DOWN
 local BufferedAction = _G.BufferedAction
 local CONTROL_PRIMARY = _G.CONTROL_PRIMARY
 
@@ -42,11 +42,18 @@ local function Bind(key, down, fn)
 	end
 end
 config.bindfn = Bind
--------------------------------- Main function! ---------------------------------
+-------------------------------- Main functions! ---------------------------------
 local function SetPause(time)
 	local pl = _G.ThePlayer
 	if pl._fa_pause then pl._fa_pause:Cancel() end
 	pl._fa_pause = pl:DoTaskInTime(time, function(pl) pl._fa_pause = nil end) 
+end
+
+local function GetWalkingDirection()
+    local xdir = TheInput:GetAnalogControlValue(CONTROL_MOVE_RIGHT) - TheInput:GetAnalogControlValue(CONTROL_MOVE_LEFT)
+    local ydir = TheInput:GetAnalogControlValue(CONTROL_MOVE_UP) - TheInput:GetAnalogControlValue(CONTROL_MOVE_DOWN)
+    local dir = _G.TheCamera:GetRightVec() * xdir - _G.TheCamera:GetDownVec() * ydir
+    return dir:GetNormalized(), xdir ~= 0 or ydir ~= 0
 end
 
 function ActionOrRPC(pos)
@@ -56,7 +63,16 @@ function ActionOrRPC(pos)
 		_G.ThePlayer.components.playercontroller:OnLeftUp()
 		TheNet:SendRPCToServer(RPC.StopWalking)
 		TheNet:SendRPCToServer(RPC.RightClick, ACTIONS.BLINK.code, pos.x,pos.z)
-		_G.ThePlayer:DoTaskInTime(1, function(inst) if TheInput:IsControlPressed(CONTROL_PRIMARY) then inst.components.playercontroller:OnLeftClick(true) end end)
+		_G.ThePlayer:DoTaskInTime(1, function(inst)
+			if TheInput:IsControlPressed(CONTROL_PRIMARY) then
+				inst.components.playercontroller:OnLeftClick(true)
+			end 
+		end)
+		_G.ThePlayer:DoTaskInTime(1, function(inst) 
+			local dir, walking = GetWalkingDirection()
+			if not walking then return end
+			TheNet:SendRPCToServer(RPC.DirectWalking, dir.x, dir.z)
+		end)
 	end
 end
 
