@@ -53,25 +53,23 @@ local function GetWalkingDirection()
     local xdir = TheInput:GetAnalogControlValue(CONTROL_MOVE_RIGHT) - TheInput:GetAnalogControlValue(CONTROL_MOVE_LEFT)
     local ydir = TheInput:GetAnalogControlValue(CONTROL_MOVE_UP) - TheInput:GetAnalogControlValue(CONTROL_MOVE_DOWN)
     local dir = _G.TheCamera:GetRightVec() * xdir - _G.TheCamera:GetDownVec() * ydir
-    return dir:GetNormalized(), xdir ~= 0 or ydir ~= 0
+    return xdir ~= 0 or ydir ~= 0, dir:GetNormalized()
 end
 
 function ActionOrRPC(pos)
 	if _G.TheWorld.ismastersim then
 		_G.ThePlayer.components.playercontroller:DoAction(BufferedAction(_G.ThePlayer, nil, ACTIONS.BLINK, nil, pos, nil, nil, true))
 	else
-		_G.ThePlayer.components.playercontroller:OnLeftUp()
-		TheNet:SendRPCToServer(RPC.StopWalking)
 		TheNet:SendRPCToServer(RPC.RightClick, ACTIONS.BLINK.code, pos.x,pos.z)
+		-- Mouse handling
+		if TheInput:IsControlPressed(CONTROL_PRIMARY) then 
+			_G.ThePlayer.components.playercontroller:OnLeftUp()
+			TheNet:SendRPCToServer(RPC.StopWalking) 
+		end
 		_G.ThePlayer:DoTaskInTime(1, function(inst)
 			if TheInput:IsControlPressed(CONTROL_PRIMARY) then
 				inst.components.playercontroller:OnLeftClick(true)
 			end 
-		end)
-		_G.ThePlayer:DoTaskInTime(1, function(inst) 
-			local dir, walking = GetWalkingDirection()
-			if not walking then return end
-			TheNet:SendRPCToServer(RPC.DirectWalking, dir.x, dir.z)
 		end)
 	end
 end
