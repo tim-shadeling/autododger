@@ -29,7 +29,10 @@ function AutoDodger:Init(config)
 	self.hopfn = config.hopfn
 		
 	if config.kite_key > 0 then
-		self.toggle_bind = config.bindfn(config.kite_key, false, function() self:ToggleDodging() end) 
+		self.toggle_bind = config.bindfn(config.kite_key, false, function()
+			if not (self.inst and self.inst.HUD and not self.inst.HUD:HasInputFocus()) then return end
+			self:ToggleDodging()
+		end) 
 	end
 end
 

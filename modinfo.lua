@@ -1,7 +1,7 @@
 name = "Wortox Haxx Pack"
 description = "Includes soul hop rebind, a dodge button and a tool to dodge *some* bosses automatically."
 author = "Remi"
-version = "0.4.2"
+version = "0.5"
 
 forumthread = ""
 
@@ -214,4 +214,26 @@ configuration_options =
         default = false,
         hover = "If enabled, souls will no longer emit particles when they move.\nThis will help with performance issues caused by large amounts of souls.",
     },    
+
+    {
+        name = "JAR_KEY",
+        label = "Open jar key",
+        options = KeybindOptions,
+        default = -1,
+        is_keybind = true,
+        hover = "Select a key that will open a soul jar from your inventory.",
+    },    
+
+    {
+        name = "JAR_CONDITION",
+        label = "Jar priority",
+        options = {
+            {description = "Pick leftmost", data = "any"},
+            {description = "Pick fullest",  data = "full"},
+            {description = "Pick emptiest", data = "empty"},
+        },
+        default = "any",
+        hover = "Select how the mod should choose the jar when using the open jar hotkey.",
+    },    
+
 }
