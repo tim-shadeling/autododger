@@ -1,7 +1,7 @@
 name = "Wortox Haxx Pack"
 description = "Includes soul hop rebind, a dodge button and a tool to dodge *some* bosses automatically."
 author = "Remi"
-version = "0.5"
+version = "0.5.1"
 
 forumthread = ""
 

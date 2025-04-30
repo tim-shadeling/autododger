@@ -18,7 +18,7 @@ end
 local function OnRemove(inst)
 	local cmp = inst.components.mod_autododger_marker
 	if cmp then -- 3 billion ifs end me
-		if cmp.followhandler then cmp.followhandler:Remove() end
+		--if cmp.followhandler then cmp.followhandler:Remove() end
 		if cmp.hop_rebind then cmp.hop_rebind:Remove() end
 		if cmp.dodge_bind then cmp.dodge_bind:Remove() end
 		if cmp.marker then cmp.marker:Remove() end
@@ -91,11 +91,11 @@ function SoulHopMarker:Init(config)
 		self.autohoprange.entity:SetParent(self.inst.entity)
 	end
 
-	self.followhandler = TheInput:AddMoveHandler(function(x, y, z)
-		x, y, z = TheSim:ProjectScreenPos(x, y)
-		if x and y and z then self.targetpos = Vector3(x,y,z) end
-		self:UpdateMarkerPosition()
-	end)
+--	self.followhandler = TheInput:AddMoveHandler(function(x, y, z)
+--		x, y, z = TheSim:ProjectScreenPos(x, y)
+--		if x and y and z then self.targetpos = Vector3(x,y,z) end
+--		self:UpdateMarkerPosition()
+--	end)
 	self._oncameraupdate = function(dt) self:OnCameraUpdate(dt) end
 	TheCamera:AddListener(self, self._oncameraupdate)
 
@@ -227,7 +227,7 @@ function SoulHopMarker:UpdateMarkerPosition(dt)
 end
 
 function SoulHopMarker:OnCameraUpdate(dt)
-    self.targetpos = TheInput:GetWorldPosition()
+    self.targetpos = TheInput:GetWorldPosition() or self.targetpos
     self:UpdateMarkerPosition()
 end
 
