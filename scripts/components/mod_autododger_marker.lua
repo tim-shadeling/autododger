@@ -69,7 +69,7 @@ function SoulHopMarker:Init(config)
 	end
 
 	if config.show_timer then
-		self.timer = self.inst.HUD.overlayroot:AddChild(FollowText(BODYTEXTFONT,25))
+		self.timer = self.inst.HUD.root:AddChild(FollowText(BODYTEXTFONT,25))
 		self.timer:SetHUD(self.inst.HUD.inst)
 		self.timer:SetOffset(Vector3(0,70,0))
 		self.timer:SetTarget(self.inst)
@@ -218,7 +218,7 @@ function SoulHopMarker:UpdateMarkerPosition(dt)
 		self.marker.scale = scale
 		self.marker.AnimState:SetScale(scale, scale, scale)
 
-		if self.inst.CanBlinkTo(self.markerpos) then
+		if self.inst:CanBlinkTo(self.markerpos) then
 			if self.ready_to_autohop then self.marker.AnimState:SetMultColour(1,1,.2,1) else self.marker.AnimState:SetMultColour(.6,1,.6,1) end
 		else
 			self.marker.AnimState:SetMultColour(1,0,0,1)

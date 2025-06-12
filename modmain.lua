@@ -91,7 +91,7 @@ function ActionOrRPC(pos)
 end
 
 function Hop(pos, attempts, pause, priority)
-	if not _G.ThePlayer:CanSoulhop() or not _G.ThePlayer.CanBlinkTo(pos) then return false end
+	if not _G.ThePlayer:CanSoulhop() or not _G.ThePlayer:CanBlinkTo(pos) then return false end
 	SetPause(pause)
 
 	if priority >= curpriority then
