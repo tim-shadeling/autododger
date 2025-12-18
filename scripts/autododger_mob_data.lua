@@ -49,6 +49,7 @@ local function CreateMobDataTable(modconfig)
 
 	return {
 		bishop			 = Params(13,	Anim("atk",					 0, in_place)),
+		bishop_nightmare = Params(13,	Anim("atk",					 0, in_place)),
 
 		--
 		dragonfly		 = Params(6,	Anim("atk",					 0, in_place)),

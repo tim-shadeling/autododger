@@ -7,9 +7,10 @@ local anims_to_check = {
 	"yawn", "dozy", "sleep_loop", "wakeup", -- sleep
 	"frozen", "frozen_loop_pst", -- freeze
 	"jump", -- wormholes
-	"empty",  -- getting vored by rask/big worm
+	"empty",  -- getting vored by raspy/big worm
 	"knockback_high", -- knockback (duh)
 	"mindcontrol_pre", "mindcontrol_loop"," mindcontrol_pst", -- fw's mind control
+	"distress_loop", -- ewecus' spit
 --	"sink", "abyss_fall", -- falling, drowning doen't work
 }
 local function NeedsMapHop(pl)

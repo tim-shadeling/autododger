@@ -8,11 +8,11 @@ next = _G.next
 unpack = _G.unpack
 require = _G.require
 tonumber = _G.tonumber
+tostring = _G.tostring
 TheNet, RPC, ACTIONS = _G.TheNet, _G.RPC, _G.ACTIONS
 TheInput = _G.TheInput
 
 TheMod = {
-	maphop = false,
 	modname = modname,
 	autododger = {},
 	config = {},
@@ -107,7 +107,7 @@ _G.AddUserCommand("impcfg", {
 		if success then
 			_G.TheFrontEnd:PushScreen(result(modname, true, Reconfigure))
 		else
-			response("Failed to open the configuration panel", result)
+			_G.ChatHistory:SendCommandResponse("Error: "..tostring(result))
 		end
 	end,
 })
