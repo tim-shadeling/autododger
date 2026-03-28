@@ -1,7 +1,7 @@
 name = "Impish Magic Pack"
 description = "A few assists and exploits to help you out."
 author = "Remi"
-version = "0.6"
+version = "0.6ce"
 
 forumthread = ""
 

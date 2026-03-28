@@ -111,3 +111,8 @@ _G.AddUserCommand("impcfg", {
 		end
 	end,
 })
+--
+AddGamePostInit(function()
+	local mods = _G.rawget(_G, "REMI_RECONFIGURABLE_MODS")
+	if mods then mods[modname] = Reconfigure end
+end)

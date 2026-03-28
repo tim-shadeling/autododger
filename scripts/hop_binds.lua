@@ -37,6 +37,8 @@ function Hop(pos, attempts, pause, priority)
 		end
 	end
 	
+	if TheInput:GetHUDEntityUnderMouse() then return end
+
 	BlinkActionOrRPC(pos)
 	if attempts > 0 then
 		local counter = 0
