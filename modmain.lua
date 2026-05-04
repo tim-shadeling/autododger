@@ -4,20 +4,24 @@ PrefabFiles = {
 }
 
 _G = GLOBAL
+debug = _G.debug
 next = _G.next
 unpack = _G.unpack
 require = _G.require
 tonumber = _G.tonumber
 tostring = _G.tostring
-TheNet, RPC, ACTIONS = _G.TheNet, _G.RPC, _G.ACTIONS
+TheSim = _G.TheSim
 TheInput = _G.TheInput
+TheNet, RPC, ACTIONS = _G.TheNet, _G.RPC, _G.ACTIONS
 
 TheMod = {
 	modname = modname,
 	autododger = {},
 	config = {},
 	binds = {},
-	-- Hop = function... -- in hop_binds_lua
+	-- telepoof_enabled = false -- in telepoof_safeguard.lua
+	-- is_imp = true/false... -- in player postinit
+	-- Hop = function... -- in hop_binds.lua
 }
 TheModConfig = TheMod.config
 _G.mod_remiimp = TheMod -- it's like remibsc but remiimp 
@@ -33,9 +37,8 @@ SetPause_FA = H.SetPause_FA
 SetPause_MapHop = H.SetPause_MapHop
 BlinkActionOrRPC = H.BlinkActionOrRPC
 MapBlinkActionOrRPC = H.MapBlinkActionOrRPC
+CanTeleport = H.CanTeleport
 --
-LoadConfig("KITE_KEY")
-LoadConfig("bone_cage_handling")
 LoadConfig("DODGE_KEY")
 LoadConfig("SOUL_HOP_REBIND")
 LoadConfig("TARGETED_HOPS")
@@ -44,6 +47,7 @@ LoadConfig("AUTOHOP_DIST_MULT")
 LoadConfig("JAR_KEY")
 LoadConfig("JAR_CONDITION")
 LoadConfig("REMOVE_SOUL_TAILS")
+LoadConfig("QUIET_TELEPOOF")
 LoadConfig("SHOW_MARKER")
 LoadConfig("SHOW_TIMER")
 LoadConfig("timer_font")
@@ -55,20 +59,18 @@ LoadConfig("SNAP_TO_MAX_RANGE")
 LoadConfig("maxrange_color")
 LoadConfig("autohop_color")
 --
-modimport "scripts/autododger"
+modimport "scripts/telepoof_safeguard"
 modimport "scripts/hop_binds"
 modimport "scripts/jar_binds"
 modimport "scripts/misc"
 
 -- Add components
 AddPlayerPostInit(function(pl) pl:DoTaskInTime(0, function(pl)
-	if pl ~= _G.ThePlayer or pl.prefab ~= "wortox" then return end
-
+	if pl ~= _G.ThePlayer then return end
+	--
+	TheMod.is_imp = pl.prefab == "wortox"
 	pl:AddComponent("remiimp_marker")
 	pl.components.remiimp_marker:Reconfigure(TheModConfig)
-
-	pl:AddComponent("remiimp_autododger")
-	pl.components.remiimp_autododger:Reconfigure(TheModConfig) -- there is nothing to reconfigure tho
 end) end)
 
 local function Reconfigure(settings)
@@ -81,12 +83,10 @@ local function Reconfigure(settings)
 	--
 	local pl = _G.ThePlayer
 	--
-		-- manual changes
+	TheMod.UpdateTelepoofSound()
 	--
 	if pl then
 		local cmp = pl.components.remiimp_marker
-		if cmp then cmp:Reconfigure(settings) end
-		cmp = pl.components.remiimp_autododger
 		if cmp then cmp:Reconfigure(settings) end
 	end 
 

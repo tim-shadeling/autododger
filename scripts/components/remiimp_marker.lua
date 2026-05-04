@@ -11,6 +11,8 @@ local timer_r2, timer_g2, timer_b2
 local maxrange_r, maxrange_g, maxrange_b
 local autohop_r, autohop_g, autohop_b
 
+local CanTeleport = require("remiimp_helperfns").CanTeleport
+
 local function GetPointBetweenAtCertainDistance(p1, p2, dist)
 	local scale = dist/p1:Dist(p2)
 	return p1 + (p2 - p1)*scale
@@ -28,23 +30,46 @@ local function OnRemove(inst)
 	local cmp = inst.components.remiimp_marker
 	if not cmp then return end
 	--
-	cmp.marker:Remove()
-	cmp.maxrange:Remove()
-	cmp.autohoprange:Remove()
-	cmp.timer:Kill()
-	TheCamera:RemoveListener(cmp, cmp._oncameraupdate)
-	inst:RemoveEventCallback("freesoulhopschanged", OnFreeHopsChanged)
 	inst:RemoveEventCallback("onremove", OnRemove)
+	cmp.maxrange:Remove()
+	cmp.marker:Remove()
+	TheCamera:RemoveListener(cmp, cmp._oncameraupdate)
+	--
+	if not mod_remiimp.is_imp then return end
+	--
+	inst:RemoveEventCallback("freesoulhopschanged", OnFreeHopsChanged)
+	cmp.timer:Kill()
+	cmp.autohoprange:Remove()
 end
 
 local SoulHopMarker = Class(function(self, inst)
-	inst:ListenForEvent("freesoulhopschanged", OnFreeHopsChanged)
+	-- GENERAL ELEMENTS
 	inst:ListenForEvent("onremove", OnRemove)
-
+	
 	self.inst = inst
 	self.targetpos = Vector3()
 	self.markerpos = Vector3()
 	self.markersvisible = true
+
+	self.maxrange = SpawnPrefab("remiimp_circle")
+	--self.maxrange.AnimState:SetAddColour(1,0,0,1)
+	self.maxrange.AnimState:SetMultColour(1,1,1,.7)
+	local scale_x,scale_y,scale_z = self.inst.Transform:GetScale()
+	self.maxrange.Transform:SetScale(HOP_RADIUS/scale_x,HOP_RADIUS/scale_y,HOP_RADIUS/scale_z)
+	self.maxrange.entity:SetParent(self.inst.entity)
+
+	self.marker = SpawnPrefab("remiimp_marker")
+	self.marker.AnimState:SetMultColour(.6,1,.6,1)
+
+	self._oncameraupdate = function(dt) self:OnCameraUpdate(dt) end
+	TheCamera:AddListener(self, self._oncameraupdate)
+
+	--
+	if not mod_remiimp.is_imp then return end
+	--
+
+	-- WORTOX-EXCLUSIVE ELEMENTS
+	inst:ListenForEvent("freesoulhopschanged", OnFreeHopsChanged)
 
 	local stu = self.inst.skilltreeupdater
 	self.echocd = TUNING.WORTOX_FREEHOP_TIMELIMIT
@@ -54,21 +79,11 @@ local SoulHopMarker = Class(function(self, inst)
 		self.inst:ListenForEvent("onactivateskill_client", function(p, data) if data and data.skill == "wortox_liftedspirits_2" then self.echocd = TUNING.SKILLS.WORTOX.WORTOX_FREEHOP_TIMELIMIT_MULT*self.echocd end end)
 	end
 
-	self.maxrange = SpawnPrefab("remiimp_circle")
-	--self.maxrange.AnimState:SetAddColour(1,0,0,1)
-	self.maxrange.AnimState:SetMultColour(1,1,1,.7)
-	local scale_x,scale_y,scale_z = self.inst.Transform:GetScale()
-	self.maxrange.Transform:SetScale(HOP_RADIUS/scale_x,HOP_RADIUS/scale_y,HOP_RADIUS/scale_z)
-	self.maxrange.entity:SetParent(self.inst.entity)
-
 	self.timer = self.inst.HUD.root:AddChild(FollowText(BODYTEXTFONT,1))
 	self.timer:SetHUD(self.inst.HUD.inst)
 	self.timer:SetOffset(Vector3(0,70,0))
 	self.timer:SetTarget(self.inst)
 	self.timer.text:SetString("")
-
-	self.marker = SpawnPrefab("remiimp_marker")
-	self.marker.AnimState:SetMultColour(.6,1,.6,1)
 
 	self.autohoprange = SpawnPrefab("remiimp_circle")
 	--self.autohoprange.AnimState:SetAddColour(1,1,0,1)
@@ -76,9 +91,6 @@ local SoulHopMarker = Class(function(self, inst)
 	--local scale_x,scale_y,scale_z = self.inst.Transform:GetScale()
 	--self.autohoprange.Transform:SetScale(AUTO_RADIUS/scale_x,AUTO_RADIUS/scale_y,AUTO_RADIUS/scale_z)
 	self.autohoprange.entity:SetParent(self.inst.entity)
-
-	self._oncameraupdate = function(dt) self:OnCameraUpdate(dt) end
-	TheCamera:AddListener(self, self._oncameraupdate)
 
 	local oldrmbfn = self.inst.components.playeractionpicker.pointspecialactionsfn
 	self.inst.components.playeractionpicker.pointspecialactionsfn = function(inst, pos, useitem, right,...)
@@ -88,33 +100,45 @@ end)
 
 function SoulHopMarker:Reconfigure(config)
 	TheModConfig = config
+	local cantp = self:UpdateCanTeleport()
 
-	local hassoul = self:UpdateUsedSoul()
-	if hassoul and TheModConfig.SOUL_HOP_REBIND > 0 and TheModConfig.SHOW_MARKER then self.marker:Show() else self.marker:Hide() end
-	if hassoul and TheModConfig.SHOW_MAXRANGE then self.maxrange:Show() else self.maxrange:Hide() end
-	--if hassoul and TheModConfig.SHOW_TIMER then self.timer:Show() else self.timer:Hide() end
-	if hassoul and TheModConfig.AUTOHOP then self.autohoprange:Show() else self.autohoprange:Hide() end
-
-	AUTO_DISTANCE = TheModConfig.AUTOHOP_DIST_MULT * HOP_DISTANCE
-	AUTO_RADIUS = math.sqrt(AUTO_DISTANCE * 300 / 1900)
-	local scale_x,scale_y,scale_z = self.inst.Transform:GetScale()
-	self.autohoprange.Transform:SetScale(AUTO_RADIUS/scale_x,AUTO_RADIUS/scale_y,AUTO_RADIUS/scale_z)
-
-	-- range displays coloring
+	-- GENERAL ELEMENTS
+	if cantp and TheModConfig.SHOW_MAXRANGE then self.maxrange:Show() else self.maxrange:Hide() end
 	local r, g, b = unpack(TheModConfig.maxrange_color)
 	self.maxrange.AnimState:SetAddColour(r,g,b,1)
-	r, g, b = unpack(TheModConfig.autohop_color)
-	self.autohoprange.AnimState:SetAddColour(r,g,b,1)
 
-	-- timer text color
+	if cantp and TheModConfig.SOUL_HOP_REBIND > 0 and TheModConfig.SHOW_MARKER then self.marker:Show() else self.marker:Hide() end
+
+	--
+	if not mod_remiimp.is_imp then return end
+	--
+
+	-- WORTOX-EXCLUSIVE ELEMENTS
 	timer_r1, timer_g1, timer_b1 = unpack(TheModConfig.timer_color_1)
 	timer_r2, timer_g2, timer_b2 = unpack(TheModConfig.timer_color_2)
 	self.timer.text:SetFont(TheModConfig.timer_font)
 	self.timer.text:SetSize(TheModConfig.timer_size)
+
+	if cantp and TheModConfig.AUTOHOP then self.autohoprange:Show() else self.autohoprange:Hide() end
+	AUTO_DISTANCE = TheModConfig.AUTOHOP_DIST_MULT * HOP_DISTANCE
+	AUTO_RADIUS = math.sqrt(AUTO_DISTANCE * 300 / 1900)
+	local scale_x,scale_y,scale_z = self.inst.Transform:GetScale()
+	self.autohoprange.Transform:SetScale(AUTO_RADIUS/scale_x,AUTO_RADIUS/scale_y,AUTO_RADIUS/scale_z)
+	r, g, b = unpack(TheModConfig.autohop_color)
+	self.autohoprange.AnimState:SetAddColour(r,g,b,1)
 end
 
-function SoulHopMarker:UpdateUsedSoul()
-	if self.lastsoul == nil or not self.lastsoul:IsValid() then
+function SoulHopMarker:UpdateCanTeleport()
+	local helditem = self.inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+	if helditem and helditem.prefab == "orangestaff" and helditem.replica.inventoryitem.classified.percentused:value() > 5 and mod_remiimp.telepoof_enabled then
+		return true
+	end
+
+	if not mod_remiimp.is_imp then return false end
+
+	if self.lastsoul and self.lastsoul:IsValid() and self.lastsoul.replica.inventory.classified then
+		return true
+	else
 		for _,item in pairs(self.inst.replica.inventory:GetItems()) do
 			if item.prefab == "wortox_soul" then
 				self.lastsoul = item
@@ -122,13 +146,13 @@ function SoulHopMarker:UpdateUsedSoul()
 				return true 
 			end
 		end
-		return false
 	end
-	return true
+
+	return false
 end
 
-function SoulHopMarker:UpdateTimer(dt)
-	if not self:UpdateUsedSoul() then
+function SoulHopMarker:UpdateTimer(dt) -- WORTOX EXCLUSIVE
+	if not self:UpdateCanTeleport() then
 		self.inst:StopUpdatingComponent(self)
 		self.timer:Hide()
 		self.ready_to_autohop = nil
@@ -158,58 +182,69 @@ function SoulHopMarker:UpdateTimer(dt)
 	end
 end
 
-function SoulHopMarker:OnUpdate(dt)
+function SoulHopMarker:OnUpdate(dt) -- WORTOX EXCLUSIVE
 	self:UpdateTimer(dt)
 end
 
 function SoulHopMarker:UpdateMarkerPosition(dt)
-	local hassoul = self:UpdateUsedSoul()
-	if self.markersvisible ~= hassoul then
-		self.markersvisible = hassoul
-		if self.markersvisible then
-			if TheModConfig.SHOW_MARKER and TheModConfig.SOUL_HOP_REBIND > 0 then self.marker:Show() end
-			if TheModConfig.AUTOHOP then self.autohoprange:Show() end
-			if TheModConfig.SHOW_MAXRANGE then self.maxrange:Show() end
-		else
-			self.marker:Hide()
-			self.autohoprange:Hide()
-			self.maxrange:Hide()
-		end
-	end
-	if not self.markersvisible then return end
-
+	local cantp = self:UpdateCanTeleport()
 	local plpos = self.inst:GetPosition()
 	local distsq = plpos:DistSq(self.targetpos)
-	
-	local alpha = math.clamp(distsq/HOP_DISTANCE^2, 0, 1)
-	self.maxrange.AnimState:SetMultColour(1,1,1,alpha) 
-	
-	local auto_alpha = math.clamp(distsq/AUTO_DISTANCE^2, 0, 1)
-	self.autohoprange.AnimState:SetMultColour(1,1,1,auto_alpha*.5) 
 
-	if TheModConfig.SNAP_TO_MAX_RANGE and distsq >= HOP_DISTANCE^2 then
-		self.markerpos = GetPointBetweenAtCertainDistance(plpos, self.targetpos, HOP_DISTANCE - .1)
-		distsq = HOP_DISTANCE^2
-	else
-		if TheModConfig.TARGETED_HOPS then
-			local target = ConsoleWorldEntityUnderMouse()
-			self.markerpos = target and target:GetPosition() or self.targetpos
+	-- GENERAL ELEMENTS
+	if cantp then
+		if not self.markersvisible then
+			if TheModConfig.SHOW_MARKER and TheModConfig.SOUL_HOP_REBIND > 0 then self.marker:Show() end
+			if TheModConfig.SHOW_MAXRANGE then self.maxrange:Show() end
+		end
+		--
+		local alpha = math.clamp(distsq/HOP_DISTANCE^2, 0, 1)
+		self.maxrange.AnimState:SetMultColour(1,1,1,alpha) 
+		
+		if TheModConfig.SNAP_TO_MAX_RANGE and distsq >= HOP_DISTANCE^2 then
+			self.markerpos = GetPointBetweenAtCertainDistance(plpos, self.targetpos, HOP_DISTANCE - .1)
+			distsq = HOP_DISTANCE^2
 		else
-			self.markerpos = self.targetpos
+			if TheModConfig.TARGETED_HOPS then
+				local target = ConsoleWorldEntityUnderMouse()
+				self.markerpos = target and target:GetPosition() or self.targetpos
+			else
+				self.markerpos = self.targetpos
+			end
+		end
+
+		local scale = 1 + alpha*3
+		self.marker.scale = scale
+		self.marker.AnimState:SetScale(scale, scale, scale)
+
+		if CanTeleport(self.markerpos) then
+			if self.ready_to_autohop then self.marker.AnimState:SetMultColour(1,1,0,1) else self.marker.AnimState:SetMultColour(.1,1,.6,1) end
+		else
+			self.marker.AnimState:SetMultColour(1,0,0,1)
+		end
+		
+		self.marker.Transform:SetPosition(self.markerpos.x,0,self.markerpos.z)
+	else
+		self.marker:Hide()
+		self.maxrange:Hide()
+	end
+
+	-- WORTOX-EXCLUSIVE ELEMENTS
+	if mod_remiimp.is_imp then
+		if cantp then
+			if not self.markersvisible then
+				if TheModConfig.AUTOHOP then self.autohoprange:Show() end
+			end
+			--
+			local auto_alpha = math.clamp(distsq/AUTO_DISTANCE^2, 0, 1)
+			self.autohoprange.AnimState:SetMultColour(1,1,1,auto_alpha*.5) 
+		else
+			self.autohoprange:Hide()
 		end
 	end
 
-	self.marker.Transform:SetPosition(self.markerpos.x,0,self.markerpos.z)
-
-	local scale = 1 + alpha*3
-	self.marker.scale = scale
-	self.marker.AnimState:SetScale(scale, scale, scale)
-
-	if self.inst:CanBlinkTo(self.markerpos) then
-		if self.ready_to_autohop then self.marker.AnimState:SetMultColour(1,1,0,1) else self.marker.AnimState:SetMultColour(.1,1,.6,1) end
-	else
-		self.marker.AnimState:SetMultColour(1,0,0,1)
-	end
+	--
+	self.markersvisible = cantp
 end
 
 function SoulHopMarker:OnCameraUpdate(dt)

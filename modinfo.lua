@@ -1,7 +1,7 @@
 name = "Impish Magic Pack"
 description = "A few assists and exploits to help you out."
 author = "Remi"
-version = "0.6ce"
+version = "0.7"
 
 forumthread = ""
 
@@ -125,15 +125,7 @@ end
 
 configuration_options =
 {
-    Header("Autododger", "", true),
-    Keybind("KITE_KEY", "Autododger toggle key", 287, "Press this near certain enemies to dodge their incoming attacks automatically."),
-    ListOption("bone_cage_handling","Bone cage handling", {
-        {description = "Hop under boss", data = "to_mob", hover = "You will take 10 damage from spikes, but avoid being trapped."},
-        {description = "Hop in place", data = "in_place", hover = "No damage, but you'll still need to escape the trap with another hop."},
-        {description = "Ignore", data = "nuthin", hover = "In case you want to have more control of the fight."},
-    }, "to_mob", "Choose the preferred way of dealing with bone cage attacks."),
-
-    Header("Soul hopping", "", true),
+    Header("Teleporting", "", true),
     Keybind("DODGE_KEY", "Dodge key", 120, "Select a key that will perform a stationary soul hop."),
     Keybind("SOUL_HOP_REBIND", "Soul Hop rebind", 1002, "Choose a new key for soul hopping instead of RMB."),
     Toggle("TARGETED_HOPS", "Targeted hops", false, "If enabled, your soul hops will snap to the entity under mouse.\nOnly works if the config above is not set to 'None'."),
@@ -160,6 +152,7 @@ configuration_options =
     }, "any", "Select how the mod should choose the jar when using the open jar hotkey."),
 
     Header("Misc", "", true),
+    Toggle("QUIET_TELEPOOF", "Quiet telepoof", false, "Enable this if you are tired of the jarring default telepoof sound."),
     Toggle("REMOVE_SOUL_TAILS", "Remove soul trails", false, "Did you know that every soul trail particle is a separate entity?"),
 
     Header("Customization", "", true),

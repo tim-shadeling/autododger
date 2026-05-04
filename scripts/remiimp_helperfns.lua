@@ -32,6 +32,13 @@ function HELPERFNS.RefreshBinds()
 	end
 end
 
+function HELPERFNS.CanTeleport(pos)
+	local x, y, z = pos:Get()
+	if (TheWorld.Map:IsAboveGroundAtPoint(x,y,z) or TheWorld.Map:GetPlatformAtPoint(x,z) ~= nil) and not TheWorld.Map:IsGroundTargetBlocked(pos) and not ThePlayer:HasTag("steeringboat") and not ThePlayer:HasTag("rotatingboat") then
+		local px, py, pz = ThePlayer.Transform:GetWorldPosition()
+		return IsTeleportingPermittedFromPointToPoint(x, y, z, px, py, pz)
+	end
+end
 ------------------------------------------------ Item Search ------------------------------------------------
 local MAX_PRIORITY = 100
 function HELPERFNS.FindItem(condition) -- inventory only cus jars (and souls) can't go in containers

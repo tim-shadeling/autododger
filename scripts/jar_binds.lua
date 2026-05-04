@@ -4,8 +4,8 @@ local JAR_CONDITIONS = {
 	any   = function(item) return item.prefab == "wortox_souljar" and 100                                                             or -1 end,
 }
 
-local function OpenJar()
-	if not InGame() or _G.ThePlayer.prefab ~= "wortox" then return end
+local function OpenJar() -- WORTOX EXCLUSIVE
+	if not InGame() or not TheMod.is_imp then return end
 
 	local jar_condition = JAR_CONDITIONS[TheModConfig.JAR_CONDITION]
 	local jar = jar_condition and FindItem(jar_condition)
