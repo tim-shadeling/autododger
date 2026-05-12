@@ -136,7 +136,7 @@ function SoulHopMarker:UpdateCanTeleport()
 
 	if not mod_remiimp.is_imp then return false end
 
-	if self.lastsoul and self.lastsoul:IsValid() and self.lastsoul.replica.inventory.classified then
+	if self.lastsoul and self.lastsoul:IsValid() and table.getfield(self.lastsoul, "replica.inventoryitem.classified") then
 		return true
 	else
 		for _,item in pairs(self.inst.replica.inventory:GetItems()) do
