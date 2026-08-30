@@ -41,6 +41,7 @@ CanTeleport = H.CanTeleport
 --
 LoadConfig("DODGE_KEY")
 LoadConfig("SOUL_HOP_REBIND")
+LoadConfig("TELEPOOF_TOGGLE_KEY")
 LoadConfig("TARGETED_HOPS")
 LoadConfig("AUTOHOP")
 LoadConfig("AUTOHOP_DIST_MULT")

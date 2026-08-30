@@ -1,7 +1,7 @@
 name = "Impish Magic Pack"
 description = "A few assists and exploits to help you out."
 author = "Remi"
-version = "0.7a"
+version = "0.7.1"
 
 forumthread = ""
 
@@ -127,7 +127,8 @@ configuration_options =
 {
     Header("Teleporting", "", true),
     Keybind("DODGE_KEY", "Dodge key", 120, "Select a key that will perform a stationary soul hop."),
-    Keybind("SOUL_HOP_REBIND", "Soul Hop rebind", 1002, "Choose a new key for soul hopping instead of RMB."),
+    Keybind("SOUL_HOP_REBIND", "Soul Hop/Telepoof rebind", 1002, "Choose a new key for soul hopping or telepoofing instead of RMB."),
+    Keybind("TELEPOOF_TOGGLE_KEY", "Telepoof toggle key", 1002, "Choose a key that will toggle telepoofing on and off.\nPress it while hovering the cursor over a Lazy Explorer in the hand slot."),
     Toggle("TARGETED_HOPS", "Targeted hops", false, "If enabled, your soul hops will snap to the entity under mouse.\nOnly works if the config above is not set to 'None'."),
     Toggle("AUTOHOP", "Auto-echo", true, "Move your cursor outside the lesser circle and the mod will do soul echoes for you.\nGood for exploration."),
     ListOption("AUTOHOP_DIST_MULT", "Auto-echo distance", {

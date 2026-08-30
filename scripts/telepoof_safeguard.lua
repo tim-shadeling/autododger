@@ -61,10 +61,23 @@ AddClassPostConstruct("widgets/itemtile", function(self)
 end)
 
 AddClassPostConstruct("widgets/equipslot", function(self)
+	-- override both key and mouse btn functions since the keybind is configurable now and can be either a keyboard button or a mouse button
+	local oldOnRawKey = self.OnRawKey
+	function self:OnRawKey(button, down)
+		local has_orangestaff = self.tile and self.tile.item and self.tile.item.prefab == "orangestaff"
+		if has_orangestaff and down and button == TheModConfig.TELEPOOF_TOGGLE_KEY then
+			SwapMode()
+			self.tile.colorcode:GetAnimState():SetAddColour(unpack(TheMod.telepoof_enabled and TELEPOOF_ON_COLOR or TELEPOOF_OFF_COLOR))
+			return true
+		else
+			return oldOnRawKey(self, button, down, x, y)
+		end
+	end
+
 	local oldOnMouseButton = self.OnMouseButton
 	function self:OnMouseButton(button, down, x, y)
 		local has_orangestaff = self.tile and self.tile.item and self.tile.item.prefab == "orangestaff"
-		if has_orangestaff and down and button == _G.MOUSEBUTTON_MIDDLE then
+		if has_orangestaff and down and button == TheModConfig.TELEPOOF_TOGGLE_KEY then
 			SwapMode()
 			self.tile.colorcode:GetAnimState():SetAddColour(unpack(TheMod.telepoof_enabled and TELEPOOF_ON_COLOR or TELEPOOF_OFF_COLOR))
 			return true
