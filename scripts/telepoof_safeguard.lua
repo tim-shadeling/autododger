@@ -38,7 +38,7 @@ local function SwapMode()
 end
 
 AddClassPostConstruct("widgets/itemtile", function(self)
-	if not (self.item and self.item.prefab == "orangestaff" and self.item.replica.equippable:IsEquipped()) then return end
+	if not (self.item and self.item:HasActionComponent("blinkstaff") and self.item.replica.equippable:IsEquipped()) then return end
 
     self.colorcode = self:AddChild(UIAnim())
     self.colorcode:MoveToBack()
@@ -64,8 +64,8 @@ AddClassPostConstruct("widgets/equipslot", function(self)
 	-- override both key and mouse btn functions since the keybind is configurable now and can be either a keyboard button or a mouse button
 	local oldOnRawKey = self.OnRawKey
 	function self:OnRawKey(button, down)
-		local has_orangestaff = self.tile and self.tile.item and self.tile.item.prefab == "orangestaff"
-		if has_orangestaff and down and button == TheModConfig.TELEPOOF_TOGGLE_KEY then
+		local has_blinkstaff = self.tile and self.tile.item and self.tile.item:HasActionComponent("blinkstaff")
+		if has_blinkstaff and down and button == TheModConfig.TELEPOOF_TOGGLE_KEY then
 			SwapMode()
 			self.tile.colorcode:GetAnimState():SetAddColour(unpack(TheMod.telepoof_enabled and TELEPOOF_ON_COLOR or TELEPOOF_OFF_COLOR))
 			return true
@@ -76,8 +76,8 @@ AddClassPostConstruct("widgets/equipslot", function(self)
 
 	local oldOnMouseButton = self.OnMouseButton
 	function self:OnMouseButton(button, down, x, y)
-		local has_orangestaff = self.tile and self.tile.item and self.tile.item.prefab == "orangestaff"
-		if has_orangestaff and down and button == TheModConfig.TELEPOOF_TOGGLE_KEY then
+		local has_blinkstaff = self.tile and self.tile.item and self.tile.item:HasActionComponent("blinkstaff")
+		if has_blinkstaff and down and button == TheModConfig.TELEPOOF_TOGGLE_KEY then
 			SwapMode()
 			self.tile.colorcode:GetAnimState():SetAddColour(unpack(TheMod.telepoof_enabled and TELEPOOF_ON_COLOR or TELEPOOF_OFF_COLOR))
 			return true
