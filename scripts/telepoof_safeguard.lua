@@ -39,7 +39,7 @@ end
 
 local function UpdateTileColor(tile)
 	if not tile.colorcode then -- REALLY shouldn't happen
-		print("ITEMTILE WITH BLINKSTAFF ITEM:", tile.item, "DIDN'T HAVE COLORCODE FOR SOME REASON!!!!! end me")
+		--print("ITEMTILE WITH BLINKSTAFF ITEM:", tile.item, "DIDN'T HAVE COLORCODE FOR SOME REASON!!!!! end me")
 		return
 	end
 	tile.colorcode:GetAnimState():SetAddColour(unpack(TheMod.telepoof_enabled and TELEPOOF_ON_COLOR or TELEPOOF_OFF_COLOR))
@@ -70,13 +70,13 @@ local function TryAddColorCode(tile)
 end
 
 local function ToggleColorCode(item, tile)
-	print("ToggleColorCode", item)
+	--print("ToggleColorCode", item)
 	tile = tile or table.getfield(_G.ThePlayer, "HUD.controls.inv.equip.hands.tile")
-	print(tile, tile and tile.item)
+	--print(tile, tile and tile.item)
 	if tile == nil then return end
 
 	if tile.item == item then
-		print("blinkstaff:", item:HasActionComponent("blinkstaff"))
+		--print("blinkstaff:", item:HasActionComponent("blinkstaff"))
 		if item:HasActionComponent("blinkstaff") then 
 			TryAddColorCode(tile)
 			UpdateTileColor(tile)
@@ -97,11 +97,11 @@ AddClassPostConstruct("widgets/itemtile", function(self)
 		--
 		item.has_remiimp_listener = true
 		item:ListenForEvent("actioncomponentsdirty", ToggleColorCode)
-		print("added remiimp listener to", item)
+		--print("added remiimp listener to", item)
 	elseif item.has_remiimp_listener then  -- clean up!
 		item.has_remiimp_listener = nil
 		item:RemoveEventCallback("actioncomponentsdirty", ToggleColorCode)
-		print("removed remiimp listener from", item)
+		--print("removed remiimp listener from", item)
 	end
 end)
 
