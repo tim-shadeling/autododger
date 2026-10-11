@@ -41,21 +41,20 @@ function HELPERFNS.CanTeleport(pos)
 end
 ------------------------------------------------ Item Search ------------------------------------------------
 local MAX_PRIORITY = 100
-function HELPERFNS.FindItem(condition) -- inventory only cus jars (and souls) can't go in containers
-	local best_prio = -1
-	local best_item
 
+function HELPERFNS.FindJar(condition) -- inventory only
+	local best_prio, best_item
 	local inv = ThePlayer.HUD.controls.inv
-	if inv then
-		for index,slot in pairs(inv.current_list) do
-			if slot.tile then
-				local item = slot.tile.item
-				local prio = condition(item)
-				if prio > best_prio then
-					best_prio = prio
-					best_item = item
-					if prio == MAX_PRIORITY then return item end
-				end
+	if not inv then return end
+
+	for index,slot in pairs(inv.current_list) do
+		if slot.tile then
+			local item = slot.tile.item
+			local prio = condition(item)
+			if prio and (best_prio == nil or prio > best_prio) then
+				best_prio = prio
+				best_item = item
+				if prio == MAX_PRIORITY then return item end
 			end
 		end
 	end
@@ -63,6 +62,34 @@ function HELPERFNS.FindItem(condition) -- inventory only cus jars (and souls) ca
 	return best_item
 end
 
+function HELPERFNS.FindSoul(condition) -- inventory and opened containers
+	local best_prio, best_item
+	local inv = ThePlayer.HUD.controls.inv
+	if not inv then return end
+
+	local function checkitem(item)
+		local prio = condition(item)
+		if prio and (best_prio == nil or prio > best_prio) then
+			best_prio = prio
+			best_item = item
+			if prio == MAX_PRIORITY then return true end
+		end
+	end
+
+	for index, slot in pairs(inv.current_list) do
+		local item = slot.tile and slot.tile.item
+		if item and checkitem(item) then return best_item end		
+	end
+
+	for container, containerwidget in pairs(_G.ThePlayer.HUD.controls.containers) do if container:IsValid() and containerwidget and containerwidget.inst.entity:IsVisible() then
+		for index, slot in pairs(containerwidget.inv) do
+			local item = slot.tile and slot.tile.item
+			if item and checkitem(item) then return best_item end
+		end
+	end end
+
+	return best_item
+end
 ------------------------------------------------ RPC or action ------------------------------------------------
 function HELPERFNS.BlinkActionOrRPC(pos)
 	if TheWorld.ismastersim then

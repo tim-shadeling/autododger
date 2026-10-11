@@ -13,6 +13,7 @@ tostring = _G.tostring
 TheSim = _G.TheSim
 TheInput = _G.TheInput
 TheNet, RPC, ACTIONS = _G.TheNet, _G.RPC, _G.ACTIONS
+GetTime = _G.GetTime
 
 TheMod = {
 	modname = modname,
@@ -32,7 +33,8 @@ LoadConfig = H.LoadConfig
 Bind = H.Bind
 ClearBinds = H.ClearBinds
 RefreshBinds = H.RefreshBinds
-FindItem = H.FindItem
+FindJar = H.FindJar
+FindSoul = H.FindSoul
 SetPause_FA = H.SetPause_FA
 SetPause_MapHop = H.SetPause_MapHop
 BlinkActionOrRPC = H.BlinkActionOrRPC
@@ -59,10 +61,13 @@ LoadConfig("SHOW_MAXRANGE")
 LoadConfig("SNAP_TO_MAX_RANGE")
 LoadConfig("maxrange_color")
 LoadConfig("autohop_color")
+LoadConfig("EATSOUL_KEY") -- new
+LoadConfig("DROPSOUL_KEY") -- new
 --
 modimport "scripts/telepoof_safeguard"
 modimport "scripts/hop_binds"
 modimport "scripts/jar_binds"
+modimport "scripts/soul_binds" -- new
 modimport "scripts/misc"
 
 -- Add components

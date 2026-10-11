@@ -130,7 +130,7 @@ end
 
 function SoulHopMarker:UpdateCanTeleport()
 	local helditem = self.inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
-	local classified = helditem and helditem.replica.inventoryitem.classified
+	local classified = helditem and helditem:IsValid() and helditem.replica.inventoryitem and helditem.replica.inventoryitem.classified
 	if classified and mod_remiimp.telepoof_enabled and helditem:HasActionComponent("blinkstaff") and classified.percentused:value() > 5 and classified.recharge:value() >= 180 then
 		return true
 	end

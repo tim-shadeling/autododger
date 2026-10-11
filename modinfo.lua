@@ -1,7 +1,7 @@
 name = "Impish Magic Pack"
 description = "A few assists and exploits to help you out."
 author = "Remi"
-version = "0.7.3a"
+version = "0.7.4"
 
 forumthread = ""
 
@@ -144,10 +144,12 @@ configuration_options =
             {description = "18.0 (50%)", data = .50},
     }, .90, "Select the minimal distance for auto-echoes. The percentage is based on maximum hop distance (36 units)."),
 
-    Header("Jar accessing", "", true),
+    Header("Jar & Soul hotkeys", "", true),
+    Keybind("EATSOUL_KEY", "Soul eating key", -1, "Select a key that will repeatedly consume souls while held."),
+    Keybind("DROPSOUL_KEY", "Soul dropping key", -1, "Select a key that will repeatedly drop souls while held."),
     Keybind("JAR_KEY", "Open jar key", -1, "Select a key that will open a soul jar from your inventory."),
     ListOption("JAR_CONDITION", "Jar priority", {
-            {description = "Pick leftmost", data = "any"},
+            {description = "Pick first", data = "any"},
             {description = "Pick fullest",  data = "full"},
             {description = "Pick emptiest", data = "empty"},
     }, "any", "Select how the mod should choose the jar when using the open jar hotkey."),
