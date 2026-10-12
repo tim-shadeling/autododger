@@ -66,7 +66,7 @@ local function StopDroppingSouls() -- WORTOX EXCLUSIVE
 	last_sound_time = -1
 end
 
-Bind("EATSOUL_KEY", StartEatingSouls, true)
-Bind("EATSOUL_KEY", StopEatingSouls)
-Bind("DROPSOUL_KEY", StartDroppingSouls, true)
-Bind("DROPSOUL_KEY", StopDroppingSouls)
+Bind("EATSOUL_KEY", StartEatingSouls, true, "EATSOUL_KEY_DOWNBIND")
+Bind("EATSOUL_KEY", StopEatingSouls, false, "EATSOUL_KEY_UPBIND")
+Bind("DROPSOUL_KEY", StartDroppingSouls, true, "DROPSOUL_KEY_DOWNBIND")
+Bind("DROPSOUL_KEY", StopDroppingSouls, false, "DROPSOUL_KEY_UPBIND")

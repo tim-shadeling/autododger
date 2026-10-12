@@ -10,7 +10,10 @@ function HELPERFNS.LoadConfig(name)
 	return mod_remiimp.config[name]
 end
 
-function HELPERFNS.Bind(config, fn, _down)
+function HELPERFNS.Bind(config, fn, _down, idoverride)
+	local id = idoverride or config -- use idoverride when making more than one bind to a single config!
+	if _down == nil then _down = false end -- no nil allowed for this!
+	--
 	local key = mod_remiimp.config[config]
 	local handler
 	if key < 1000 then
@@ -22,13 +25,14 @@ function HELPERFNS.Bind(config, fn, _down)
 	end
 	handler.actualfn = fn
 	handler._down = _down
-	mod_remiimp.binds[config] = handler
+	handler.config = config
+	mod_remiimp.binds[id] = handler
 end
 
 function HELPERFNS.RefreshBinds()
-	for config, bind in pairs(mod_remiimp.binds) do
+	for id, bind in pairs(mod_remiimp.binds) do
 		bind:Remove()
-		HELPERFNS.Bind(config, bind.actualfn, bind._down)
+		HELPERFNS.Bind(bind.config, bind.actualfn, bind._down, id)
 	end
 end
 

@@ -73,7 +73,7 @@ Bind("SOUL_HOP_REBIND", function()
 	if cmp and cmp:UpdateCanTeleport() and Hop(cmp.markerpos, 5, 1, 2) then cmp:FlashMarker() end
 end, true)
 
-Bind("DODGE_KEY", function() -- WORTOX ESCLUSIVE
+Bind("DODGE_KEY", function() -- WORTOX EXCLUSIVE
 	if not InGame() then return end
 	--
 	local pl = _G.ThePlayer
